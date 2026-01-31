@@ -1,0 +1,34 @@
+const int TempPin = A0;   // select the input pin for the potentiometer
+int TempValue = 0;
+int PWMpin = 3;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(PWMpin, OUTPUT);
+  analogWrite(PWMpin, 0);
+}
+
+void loop() {
+  // read the value from the sensor:
+  // Arduino reads 0 to 5V on a scale from 0 to 1023
+  // TMP36 maps 0°C to 0.500 V and it rises 0.010 V per 1 °C. -> 100°C per 1V increase
+  
+  TempValue = analogRead(TempPin);   
+  // For troubleshooting lets read voltage level
+  float TempVolt = TempValue * (5.0/1023.0);
+
+  //Convert from volts to °C
+  float TempC = (TempVolt - 0.500) * 100.0;
+  float TempF = TempC * 9.0/5.0 + 32.0;
+
+  // Serial.print("TempValue: ");   Serial.print(TempValue);
+  // Serial.print("  Volts: ");   Serial.print(TempVolt);
+  // Serial.print("  Celsius: ");   Serial.print(TempC);
+  // Serial.print("  Farenheight: ");   Serial.println(TempF);
+  Serial.println(TempF);
+  Serial.print(",");
+  Serial.print("62"); // Minimum limit
+  Serial.print(",");
+  Serial.println("72"); // Maximum limit
+;  delay(200);
+}
