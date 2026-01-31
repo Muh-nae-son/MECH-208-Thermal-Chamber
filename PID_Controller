@@ -1,0 +1,96 @@
+// Initialize pin values
+const int TempPin = A0;  // select the input pin for the potentiometer or temp sensor
+int TempValue = 0;       // Initialize temperature value
+const int PWMpin = 3;    // Pwmpin output for control signal
+
+// Initialize control variables
+float setpointF = 74  // (74 degrees farenheight)
+float kp = 0;
+float ki = 0;
+float kd = 0;
+
+// initialize variables for iteration and logic
+// Sampling time for controller.
+// Even though you might sample at 200 ms for plotting, you dont want to sample that fast and add control effort at every 200ms cause overkill
+const unsigned long sampleTimeMs = 500;
+unsigned long lasTimeMs = 0;
+
+float integral = 0.0;
+float lasTempF = 0.0;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(PWMpin, OUTPUT);
+  analogWrite(PWMpin, 0);
+}
+
+void loop() {
+ // Keep track of current time
+ unsigned long now = milis();
+
+
+ // if more than x amount of time has passed based on your preset sample time, 
+ // calculate how much time has passed since last sample in seconds and 
+ // then increase the value of lastime to the time at which you took the last sample
+ if (now - lasTimeMs >= sampleTimeMs) {
+  float dt = (now - lastTimeMs) / 1000.0;
+  lastTimeMs = now;
+
+  float tempF = readTempF()
+
+  ///////////////////////////////
+  // CONTROL SYSTEM!!! :)  :)  :)
+  ///////////////////////////////
+
+  float error = setpointF - tempF;
+
+  float P_effort = Kp * error;
+
+  integral = integral + error*dt;
+
+  // clamp integral so that Ki*integral can't push output beyond limits
+    if (Ki > 0.0) {
+      float integralMin = outMin / Ki;
+      float integralMax = outMax / Ki;
+      if (integral < integralMin) integral = integralMin;
+      if (integral > integralMax) integral = integralMax;
+    }
+    float I = Ki * integral;
+
+  // Derivative
+    float dTemp = (tempF - lastTempF) / dt;
+    float D = -Kd * dTemp;
+    lastTempF = tempF;
+
+    // 3) Compute output and clamp
+    float output = P + I + D;
+    if (output > outMax) output = outMax;
+    if (output < outMin) output = outMin;
+
+    analogWrite(PWMpin, (int)output);
+
+
+    // plot with bounds, setpoint, live input and pwm output
+    Serial.print(tempF);        Serial.print(",");
+    Serial.print(setpointF);    Serial.print(",");
+    Serial.print(62);    Serial.print(",");
+    Serial.print(72);    Serial.print(",");
+    Serial.print(output);       Serial.println();
+
+ }
+}
+
+// read the value from the sensor with readtemp function
+float readTempF() {
+  // Arduino reads 0 to 5V on a scale from 0 to 1023
+  // TMP36 maps 0°C to 0.500 V and it rises 0.010 V per 1 °C. -> 100°C per 1V increase
+
+  TempValue = analogRead(TempPin);
+  // For troubleshooting lets read voltage level
+  float TempVolt = TempValue * (5.0 / 1023.0);
+
+  //Convert from volts to °C
+  float TempC = (TempVolt - 0.500) * 100.0;
+  float TempF = TempC * 9.0 / 5.0 + 32.0;
+  return TempF;
+}
