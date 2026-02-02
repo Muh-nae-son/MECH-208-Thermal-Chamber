@@ -1,0 +1,87 @@
+const int TempPin = A0;   // select the input pin for the potentiometer or temp sensor
+int TempValue = 0;        // Initialize temperature value
+const int PWMpin = 3;     // Pwmpin output for control signal
+const int RedLed = 7;
+const int YellowLed = 6;
+const int GreenLed = 5;
+
+// Threshold Values
+const int T1 = 73.0;
+const int T2 = 83.0;
+const int T3 = 85.0;
+
+// Hysteresis state:
+bool PwmOn = false;
+
+// PWM Values
+const int PWM_On  = 255;
+const int PWM_Off = 0;
+
+void setup() {
+  Serial.begin(9600);
+
+  pinMode(PWMpin, OUTPUT);
+  pinMode(RedLed, OUTPUT);
+  pinMode(YellowLed, OUTPUT);
+  pinMode(GreenLed, OUTPUT);
+
+  analogWrite(PWMpin, PWM_Off);
+}
+
+void loop() {
+  // Read temperature
+  float TempF = readTempF();
+
+  //Control law:
+  // Start off with pwm signal being off initially
+  if (PwmOn) {
+    if (TempF >= T2) PwmOn = false;
+    // If pwm signal is already on,
+    // turn off pwm if temp is above T2
+  }
+  else {
+    if (TempF <= T1) PwmOn = true;
+    // else, if pwm signal is not on,
+    // if temp is below t1 turn pwm on
+  }
+
+  analogWrite (PWMpin, PwmOn ? PWM_On : PWM_Off);
+
+  // LED stuff
+  // Turn on Green if temp above below T1
+  digitalWrite(GreenLed, (TempF < T1) ? HIGH : LOW);
+
+  // Turn on yellow led based on boolean
+  digitalWrite(YellowLed, PwmOn ? HIGH : LOW);
+
+  // Turn on red led based on T3
+  digitalWrite(RedLed, (TempF >= T3) ? HIGH : LOW);
+
+
+  // Serial plotter stuff
+  Serial.print(TempF);
+  Serial.print(",");
+  Serial.print(T1);
+  Serial.print(",");
+  Serial.print(T2);
+  Serial.print(",");
+  Serial.println(T3);
+
+  delay(200);
+
+}
+
+// read the value from the sensor with readtemp function
+float readTempF() {
+  // Arduino reads 0 to 5V on a scale from 0 to 1023
+  // TMP36 maps 0°C to 0.500 V and it rises 0.010 V per 1 °C. -> 100°C per 1V increase
+
+  TempValue = analogRead(TempPin);
+  // For troubleshooting lets read voltage level
+  float TempVolt = TempValue * (5.0 / 1023.0);
+
+  //Convert from volts to °C
+  float TempC = (TempVolt - 0.500) * 100.0;
+  float TempF = TempC * 9.0 / 5.0 + 32.0;
+  return TempF;
+}
