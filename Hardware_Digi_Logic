@@ -1,11 +1,11 @@
 const int TempPin = A0;   // select the input pin for the potentiometer or temp sensor
 int TempValue = 0;        // Initialize temperature value
-const int PWMpin = 3;           // Pwmpin output for control signal
+
 //Memory pins on Arduino
-const int TCO = 10;
-const int THO = 11;
-const int TCF = 12;
-const int THF = 13;
+const int D1 = 10;
+const int Q1 = 12;
+const int Q11 = 9;
+
 // Variable to store the value read from the input pin
 int pinStateC = 0;
 int pinStateH = 0;
@@ -16,21 +16,18 @@ unsigned long lastTimeMs = 0;
 
 void setup() {
   Serial.begin(9600);
-  pinMode(PWMpin, OUTPUT);
-  analogWrite(PWMpin, 0);
-  pinMode(TCO, INPUT);
-  pinMode(TCF, OUTPUT);
-  pinMode(THO, INPUT);
-  pinMode(THF, OUTPUT);
+  pinMode(D1, INPUT);
+  pinMode(Q1, OUTPUT);
+  pinMode(Q11, OUTPUT);
 }
 
 void loop() {
-// Keep track of current time
-unsigned long now = millis();
-// if more than x amount of time has passed based on your preset sample time, 
-// calculate how much time has passed since last sample in seconds and 
-// then increase the value of lastime to the time at which you took the last sample
-if (now - lastTimeMs >= sampleTimeMs) {
+ // Keep track of current time
+ unsigned long now = millis();
+ // if more than x amount of time has passed based on your preset sample time, 
+ // calculate how much time has passed since last sample in seconds and 
+ // then increase the value of lastime to the time at which you took the last sample
+ if (now - lastTimeMs >= sampleTimeMs) {
   float dt = (now - lastTimeMs) / 1000.0;
   lastTimeMs = now;
 
@@ -38,13 +35,12 @@ if (now - lastTimeMs >= sampleTimeMs) {
 
   // Memory Storage
   // Read the state of the input pin (either HIGH or LOW)
-  pinStateC = digitalRead(TCO);
-  pinStateH = digitalRead(THO);
+  pinStateC = digitalRead(D1);
   // Write that same state to the output pin
-  digitalWrite(TCF, pinStateC);
-  digitalWrite(THF, pinStateH);
+  digitalWrite(Q1, pinStateC);
+  digitalWrite(Q11, pinStateC);
 
-  // plot with bounds, setpoint, live input and pwm output
+  // plot with bounds, setpoint, live input and 
   Serial.print(tempF);        Serial.print(",");
   Serial.print(62);    Serial.print(",");
   Serial.print(72);    Serial.println();
