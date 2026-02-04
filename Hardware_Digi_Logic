@@ -42,8 +42,8 @@ void loop() {
 
   // plot with bounds, setpoint, live input and 
   Serial.print(tempF);        Serial.print(",");
-  Serial.print(62);    Serial.print(",");
-  Serial.print(72);    Serial.println();
+  Serial.print(74);    Serial.print(",");
+  Serial.print(84);    Serial.println();
   }
 }
 
