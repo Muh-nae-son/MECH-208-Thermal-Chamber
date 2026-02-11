@@ -4,16 +4,18 @@ int TempValue = 0;       // Initialize temperature value
 const int PWMpin = 3;    // Pwmpin output for control signal
 
 // Initialize control variables
-float setpointF = 74  // (74 degrees farenheight)
-float kp = 0;
-float ki = 0;
-float kd = 0;
+float setpointF = 74;  // (74 degrees farenheight)
+float Kp = 0;
+float Ki = 0;
+float Kd = 0;
+float outMin = 0;
+float outMax = 255;
 
 // initialize variables for iteration and logic
 // Sampling time for controller.
 // Even though you might sample at 200 ms for plotting, you dont want to sample that fast and add control effort at every 200ms cause overkill
 const unsigned long sampleTimeMs = 500;
-unsigned long lasTimeMs = 0;
+unsigned long lastTimeMs = 0;
 
 float integral = 0.0;
 float lasTempF = 0.0;
@@ -26,17 +28,17 @@ void setup() {
 
 void loop() {
  // Keep track of current time
- unsigned long now = milis();
+ unsigned long now = millis();
 
 
  // if more than x amount of time has passed based on your preset sample time, 
  // calculate how much time has passed since last sample in seconds and 
  // then increase the value of lastime to the time at which you took the last sample
- if (now - lasTimeMs >= sampleTimeMs) {
+ if (now - lastTimeMs >= sampleTimeMs) {
   float dt = (now - lastTimeMs) / 1000.0;
   lastTimeMs = now;
 
-  float tempF = readTempF()
+  float tempF = readTempF();
 
   ///////////////////////////////
   // CONTROL SYSTEM!!! :)  :)  :)
