@@ -1,0 +1,49 @@
+// Initialize pin values
+const int TempPin = A0;  // select the input pin for the potentiometer or temp sensor
+int TempValue = 0;       // Initialize temperature value
+const int PWMpin = 3;    // Pwmpin output for control signal
+
+// Initialize control variables
+float setpointF = 76;  // (74 degrees farenheight)
+
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(PWMpin, OUTPUT);
+  analogWrite(PWMpin, 0);
+}
+
+void loop() {
+  float tempF = readTempF();
+  int output = ireadTempF(setpointF);
+  analogWrite(PWMpin, (int)output);
+
+  // plot with bounds, setpoint, live input and pwm output
+  // Serial.print(tempF);        Serial.print(",");
+  // Serial.print(setpointF);    Serial.print(",");
+  // Serial.print(64);           Serial.print(",");
+  // Serial.print(74);           Serial.print(",");
+  Serial.print(tempF);       Serial.println();
+  delay(10);
+ }
+
+// read the value from the sensor with readtemp function
+float readTempF() {
+  // Arduino reads 0 to 5V on a scale from 0 to 1023
+  // TMP36 maps 0°C to 0.500 V and it rises 0.010 V per 1 °C. -> 100°C per 1V increase
+
+  TempValue = analogRead(TempPin);
+  // For troubleshooting lets read voltage level
+  float TempVolt = TempValue * (5.0 / 1023.0);
+
+  //Convert from volts to °C
+  float TempC = (TempVolt - 0.500) * 100.0;
+  float TempF = TempC * 9.0 / 5.0 + 32.0;
+  return TempF;
+}
+
+// Convert temperature to PWM values
+int ireadTempF(float TempFin) {
+  float PWM = TempFin * 0.8444444; // Open loop gain
+  return PWM;
+}
