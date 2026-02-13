@@ -40,8 +40,6 @@ void loop() {
     // Serial plot: temp, setpoint, lower bound, upper bound, output
     Serial.print(tempF);        Serial.print(",");
     Serial.print(setpointF);    Serial.print(",");
-    Serial.print(62);           Serial.print(",");
-    Serial.print(72);           Serial.print(",");
     Serial.print(output);       Serial.println();
   }
 }
