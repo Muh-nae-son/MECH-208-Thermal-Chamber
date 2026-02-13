@@ -30,7 +30,6 @@ void loop() {
  // Keep track of current time
  unsigned long now = millis();
 
-
  // if more than x amount of time has passed based on your preset sample time, 
  // calculate how much time has passed since last sample in seconds and 
  // then increase the value of lastime to the time at which you took the last sample
@@ -46,7 +45,7 @@ void loop() {
 
   float error = setpointF - tempF;
 
-  float P_effort = Kp * error;
+  float P = Kp * error;
 
   integral = integral + error*dt;
 
@@ -60,9 +59,9 @@ void loop() {
     float I = Ki * integral;
 
   // Derivative
-    float dTemp = (tempF - lastTempF) / dt;
+    float dTemp = (tempF - lasTempF) / dt;
     float D = -Kd * dTemp;
-    lastTempF = tempF;
+    lasTempF = tempF;
 
     // 3) Compute output and clamp
     float output = P + I + D;
