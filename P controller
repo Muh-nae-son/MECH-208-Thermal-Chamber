@@ -1,0 +1,59 @@
+// Initialize pin values
+const int TempPin = A0;      // TMP36 output to A0
+int TempValue = 0;
+const int PWMpin = 3;        // PWM output pin
+
+// Control variables
+float setpointF = 74.0;      // degrees F
+float Kp = 10.0;             // <-- tune this!
+float outMin = 0.0;
+float outMax = 255.0;
+
+// Sampling time for controller
+const unsigned long sampleTimeMs = 500;
+unsigned long lastTimeMs = 0;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(PWMpin, OUTPUT);
+  analogWrite(PWMpin, 0);
+}
+
+void loop() {
+  unsigned long now = millis();
+
+  if (now - lastTimeMs >= sampleTimeMs) {
+    lastTimeMs = now;
+
+    float tempF = readTempF();
+
+    // Proportional control
+    float error = setpointF - tempF;
+    float output = Kp * error;
+
+    // Clamp output to valid PWM range
+    if (output > outMax) output = outMax;
+    if (output < outMin) output = outMin;
+
+    analogWrite(PWMpin, (int)output);
+
+    // Serial plot: temp, setpoint, lower bound, upper bound, output
+    Serial.print(tempF);        Serial.print(",");
+    Serial.print(setpointF);    Serial.print(",");
+    Serial.print(62);           Serial.print(",");
+    Serial.print(72);           Serial.print(",");
+    Serial.print(output);       Serial.println();
+  }
+}
+
+// Read the value from the sensor and return temperature in Fahrenheit
+float readTempF() {
+  TempValue = analogRead(TempPin);
+  float TempVolt = TempValue * (5.0 / 1023.0);
+
+  // TMP36: 0.5V at 0°C, +10mV/°C
+  float TempC = (TempVolt - 0.500) * 100.0;
+  float TempF = TempC * 9.0 / 5.0 + 32.0;
+
+  return TempF;
+}
