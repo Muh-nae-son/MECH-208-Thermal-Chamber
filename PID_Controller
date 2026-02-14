@@ -5,9 +5,9 @@ const int PWMpin = 3;    // Pwmpin output for control signal
 
 // Initialize control variables
 float setpointF = 74;  // (74 degrees farenheight)
-float Kp = 0;
-float Ki = 0;
-float Kd = 0;
+float Kp = 5.0;
+float Ki = 0.4;
+float Kd = 0.2;
 float outMin = 0;
 float outMax = 255;
 
@@ -72,11 +72,12 @@ void loop() {
 
 
     // plot with bounds, setpoint, live input and pwm output
-    Serial.print(tempF);        Serial.print(",");
-    Serial.print(setpointF);    Serial.print(",");
-    Serial.print(62);    Serial.print(",");
-    Serial.print(72);    Serial.print(",");
-    Serial.print(output);       Serial.println();
+    Serial.print(tempF); Serial.print(",");
+    Serial.print(setpointF); Serial.print(",");
+    Serial.print(output); Serial.print(",");
+    Serial.print(P); Serial.print(",");
+    Serial.print(I); Serial.print(",");
+    Serial.print(D); Serial.println(",");
 
  }
 }
