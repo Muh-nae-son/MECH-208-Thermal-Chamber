@@ -77,7 +77,7 @@ void loop() {
     Serial.print(output); Serial.print(",");
     Serial.print(P); Serial.print(",");
     Serial.print(I); Serial.print(",");
-    Serial.print(D); Serial.println(",");
+    Serial.print(D); Serial.println();
 
  }
 }
