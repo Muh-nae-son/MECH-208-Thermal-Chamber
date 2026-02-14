@@ -63,9 +63,11 @@ void loop() {
     analogWrite(PWMpin, (int)output);
 
     // Serial plot
+    Serial.print(tempF);       Serial.print(",");
     Serial.print(setpointF);    Serial.print(",");
     Serial.print(output);    Serial.print(",");
-    Serial.print(tempF);       Serial.println();
+    Serial.print(P);    Serial.print(",");
+    Serial.print(I);       Serial.println();
   }
 }
 
