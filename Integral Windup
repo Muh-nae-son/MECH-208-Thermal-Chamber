@@ -1,0 +1,92 @@
+// Initialize pin values
+const int TempPin = A0;
+int TempValue = 0;
+const int PWMpin = 3;
+
+// Control variables
+float setpointF = 200.0;   // start at 200F
+float Kp = 5.0;     
+float Ki = 0.4;     
+float outMin = 0.0;
+float outMax = 255.0;
+
+// Sampling time
+const unsigned long sampleTimeMs = 500;
+unsigned long lastTimeMs = 0;
+
+// Integral state
+float integral = 0.0;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(PWMpin, OUTPUT);
+  analogWrite(PWMpin, 0);
+}
+
+void loop() {
+
+  unsigned long now = millis();
+
+  if (now - lastTimeMs >= sampleTimeMs) {
+
+    float dt = (now - lastTimeMs) / 1000.0;  // seconds
+    lastTimeMs = now;
+
+    // Drop setpoint after 300 seconds
+    if (now >= 300000) {
+      setpointF = 70.0;
+    }
+
+    float tempF = readTempF();
+
+    // Error
+    float error = setpointF - tempF;
+
+    // Proportional term
+    float P = Kp * error;
+
+    // Integral term
+    integral += error * dt;
+
+    // // Anti-windup clamp
+    // if (Ki > 0.0) {
+    //   float integralMin = outMin / Ki;
+    //   float integralMax = outMax / Ki;
+    //   if (integral < integralMin) integral = integralMin;
+    //   if (integral > integralMax) integral = integralMax;
+    // }
+
+    float I = Ki * integral;
+
+    // Compute output
+    float output = P + I;
+
+    // Clamp output
+    if (output > outMax) output = outMax;
+    if (output < outMin) output = outMin;
+
+    analogWrite(PWMpin, (int)output);
+
+    // Serial plot
+    Serial.print(tempF);       Serial.print(",");
+    Serial.print(setpointF);   Serial.print(",");
+    Serial.print(output);      Serial.print(",");
+    Serial.print(P);           Serial.print(",");
+    Serial.print(I);           Serial.println();
+  }
+}
+
+
+// TMP36 temperature read function
+float readTempF() {
+
+  TempValue = analogRead(TempPin);
+
+  float TempVolt = TempValue * (5.0 / 1023.0);
+
+  float TempC = (TempVolt - 0.500) * 100.0;
+
+  float TempF = TempC * 9.0 / 5.0 + 32.0;
+
+  return TempF;
+}
