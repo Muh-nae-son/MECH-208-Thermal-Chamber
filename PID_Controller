@@ -1,10 +1,10 @@
 // Initialize pin values
-const int TempPin = A0;  // select the input pin for the potentiometer or temp sensor
-int TempValue = 0;       // Initialize temperature value
-const int PWMpin = 3;    // Pwmpin output for control signal
+const int TempPin = A0;  // Temp sensor
+int TempValue = 0;       
+const int PWMpin = 3;    // Pwmpin 
 
 // Initialize control variables
-float setpointF = 79;  // (74 degrees farenheight)
+float setpointF = 79;  // (degrees farenheight)
 float Kp = 5.0;
 float Ki = 0.4;
 float Kd = 0.2;
