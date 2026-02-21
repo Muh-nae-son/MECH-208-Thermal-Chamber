@@ -1,6 +1,6 @@
 const int TempPin = A0;   // select the input pin for the potentiometer or temp sensor
 int TempValue = 0;        // Initialize temperature value
-const int PWMpin = 3;           // Pwmpin output for control signal
+const int PWMpin = 3;     // Pwmpin output for control signal
 
 void setup() {
   Serial.begin(9600);
